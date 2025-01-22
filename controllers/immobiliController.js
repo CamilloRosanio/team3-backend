@@ -79,7 +79,7 @@ function index(req, res) {
     // SQL INDEX QUERY - CLOSING LINES
     sqlIndex += `
     GROUP BY immobili.id
-    ORDER BY immobili.num_likes`;
+    ORDER BY immobili.num_likes DESC`;
 
     // CALL INDEX QUERY
     connection.query(sqlIndex, filtersArray, (err, results) => {
@@ -109,67 +109,72 @@ function index(req, res) {
 // SHOW
 function show(req, res) {
 
-    // // URL PARAMETER
-    // const id = req.params.id;
+    // URL PARAMETER
+    const id = req.params.id;
 
-    // // SQL SHOW QUERY
-    // const sqlShow = `
-    // SELECT 
-    //     movies.id,
-    //     movies.title,
-    //     movies.genre,
-    //     movies.image,
-    //     movies.abstract,
-    //     AVG(reviews.vote) AS vote_avg 
-    //     FROM movies.movies
-    //     LEFT JOIN movies.reviews
-    //     ON movies.id = reviews.movie_id
-    //     WHERE movies.id = ?
-    // GROUP BY movies.id`;
+    // SQL SHOW QUERY
+    const sqlShow = `
+    SELECT 
+        immobili.*,
+        AVG(recensioni.voto) AS voto,
+        proprietari.id AS id_proprietario,
+        proprietari.nome AS nome_proprietario,
+        proprietari.cognome AS cognome_proprietario,
+        proprietari.email AS email_proprietario,
+        proprietari.telefono AS telefono_proprietario
+        FROM boolbnb.immobili
+        LEFT JOIN boolbnb.recensioni
+        ON immobili.id = recensioni.id_immobile
+        JOIN boolbnb.proprietari
+        ON immobili.id_proprietario = proprietari.id
+        WHERE immobili.id = ?
+    GROUP BY immobili.id`;
 
-    // // CALL SHOW QUERY
-    // connection.query(sqlShow, [id], (err, results) => {
+    // CALL SHOW QUERY
+    connection.query(sqlShow, [id], (err, results) => {
 
-    //     // ERROR HANDLER
-    //     if (err) {
-    //         return errorHandler500(err, res);
-    //     }
+        // ERROR HANDLER
+        if (err) {
+            return errorHandler500(err, res);
+        }
 
-    //     // ERROR HANDLER
-    //     if (results.length === 0) {
-    //         return errorHandler404(null, res);
-    //     }
+        // ERROR HANDLER
+        if (results.length === 0) {
+            return errorHandler404(null, res);
+        }
 
-    //     const [movie] = results;
+        const [immobile] = results;
 
-    //     // ITEM IMAGE PATH MAPPING
-    //     movie.image = generateCompleteImagePath(movie.image);
+        // ITEM IMAGE PATH MAPPING
+        immobile.immagine = generateCompleteImagePath(immobile.immagine);
 
-    //     // REVIEWS QUERY
-    //     const sqlIndexReviews = `
-    //         SELECT 
-    //             id,
-    //             name,
-    //             vote,
-    //             text
-    //         FROM movies.reviews
-    //         WHERE movie_id = ?`;
+        // REVIEWS QUERY
+        const sqlIndexReviews = `
+        SELECT
+		    recensioni.*,
+            utenti.id AS id_utente,
+            utenti.nome AS nome_utente,
+            utenti.cognome AS cognome_utente
+            FROM boolbnb.recensioni
+            JOIN boolbnb.utenti
+            ON recensioni.id_utente = utenti.id
+        WHERE recensioni.id_immobile = ?`;
 
-    //     // CALL INDEX REVIEWS QUERY
-    //     connection.query(sqlIndexReviews, [id], (err, reviewResults) => {
+        // CALL INDEX REVIEWS QUERY
+        connection.query(sqlIndexReviews, [id], (err, reviewResults) => {
 
-    //         // ERROR HANDLER
-    //         if (err) {
-    //             return errorHandler500(err, res);
-    //         }
+            // ERROR HANDLER
+            if (err) {
+                return errorHandler500(err, res);
+            }
 
-    //         // PROPERTY ADDED TO THE ELEMENT
-    //         movie.reviews = reviewResults;
+            // PROPERTY ADDED TO THE ELEMENT
+            immobile.recensioni = reviewResults;
 
-    //         // POSITIVE RESPONSE
-    //         res.json(movie);
-    //     });
-    // });
+            // POSITIVE RESPONSE
+            res.json(immobile);
+        });
+    });
 };
 
 // EXPORT CRUD
