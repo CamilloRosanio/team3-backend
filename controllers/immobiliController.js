@@ -33,7 +33,7 @@ function index(req, res) {
     const filterBeds = req.query.beds || '1';
     const filterType = req.query.type || '%';
 
-    // SQL INDEX QUERY
+    // SQL QUERY
     let sqlIndex = `
     SELECT 
         immobili.*,
@@ -76,7 +76,7 @@ function index(req, res) {
         firstFilter = false;
     }
 
-    // SQL INDEX QUERY - CLOSING LINES
+    // SQL QUERY - CLOSING LINES
     sqlIndex += `
     GROUP BY immobili.id
     ORDER BY immobili.num_likes DESC`;
@@ -112,7 +112,7 @@ function show(req, res) {
     // URL PARAMETER
     const id = req.params.id;
 
-    // SQL SHOW QUERY
+    // SQL QUERY
     const sqlShow = `
     SELECT 
         immobili.*,
@@ -193,7 +193,7 @@ function store(req, res) {
     // QUERY PARAMS ARRAY
     const sqlParams = [id_proprietario, titolo, num_stanze, num_letti, num_bagni, città, indirizzo, tipologia, mq];
 
-    // SQL STORE QUERY
+    // SQL QUERY
     let sqlStore = `
     INSERT INTO boolbnb.immobili (
         id_proprietario,
@@ -223,6 +223,35 @@ function store(req, res) {
         });
     });
 };
+
+
+// MODIFY
+function modify(req, res) {
+
+    // URL PARAMETER
+    const id = req.params.id;
+
+    // SQL QUERY
+    const sqlModify = `
+    UPDATE boolbnb.immobili
+        SET immobili.num_likes = (immobili.num_likes + 1)
+    WHERE immobili.id = ?`;
+
+    // CALL MODIFY QUERY
+    connection.query(sqlModify, [id], (err, results) => {
+
+        // ERROR HANDLER
+        if (err) {
+            return errorHandler500(err, res);
+        }
+
+        // POSITIVE RESPONSE
+        res.status(201).json({
+            message: 'Add Like successful: +1 Like',
+            id_immobile: id
+        });
+    });
+}
 
 
 // EXPORT CRUD
