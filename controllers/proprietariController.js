@@ -38,7 +38,7 @@ function show(req, res) {
         proprietari.email,
         proprietari.telefono
         FROM boolbnb.proprietari
-        WHERE movies.id = ?
+        WHERE proprietari.id = ?
     `;
 
     // CALL SHOW QUERY

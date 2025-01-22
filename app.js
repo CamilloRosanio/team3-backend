@@ -30,6 +30,8 @@ app.use(cors(corsOptions));
 // REGISTERING ROUTES
 const proprietariRouter = require('./routers/proprietariRouter');
 app.use('/api/proprietari', proprietariRouter);
+const immobiliRouter = require('./routers/immobiliRouter');
+app.use('/api/immobili', immobiliRouter);
 
 
 // ERROR HANDLERS
