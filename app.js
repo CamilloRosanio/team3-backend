@@ -2,6 +2,7 @@
 const express = require("express");
 const app = express();
 
+
 // IMPORT ENV + DEFAULT
 const { APP_HOST, APP_PORT, CORS_PORT } = process.env;
 
@@ -11,6 +12,7 @@ const config = {
     CORS_PORT: CORS_PORT || "5173",
 };
 
+
 // REGISTERING CORS
 const cors = require("cors");
 const corsOptions = {
@@ -18,10 +20,12 @@ const corsOptions = {
     optionSuccessStatus: 200,
 };
 
+
 // REGISTERING MIDDLEWARES
 app.use(express.json());
 app.use(express.static("public"));
 app.use(cors(corsOptions));
+
 
 // REGISTERING ROUTES
 const immobiliRouter = require("./routers/immobiliRouter");
@@ -29,11 +33,13 @@ app.use("/api/immobili", immobiliRouter);
 const recensioniRouter = require("./routers/recensioniRouter");
 app.use("/api/recensioni", recensioniRouter);
 
+
 // ERROR HANDLERS
-const notFound = require("./middlewares/notFound");
-app.use(notFound);
 const errorsHandler = require("./middlewares/errorsHandler");
 app.use(errorsHandler);
+const notFound = require("./middlewares/notFound");
+app.use(notFound);
+
 
 // SERVER LISTENING
 app.listen(config.APP_PORT, () => {

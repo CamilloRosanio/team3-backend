@@ -2,11 +2,15 @@
 const express = require("express");
 const router = express.Router();
 
+
 // IMPORT CONTROLLER
-const { index } = require("../controllers/recensioniController");
+const { store } = require("../controllers/recensioniController");
+
 
 // DICHIARAZIONE ROUTES
-router.get("/", index);
+router.post('/', store);
+
 
 // EXPORT ROUTER
 module.exports = router;
+

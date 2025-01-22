@@ -4,12 +4,14 @@ const router = express.Router();
 
 
 // IMPORT CONTROLLER
-const { index, show } = require('../controllers/immobiliController');
+const { index, show, store, modify } = require('../controllers/immobiliController');
 
 
 // DICHIARAZIONE ROUTES
 router.get('/', index);
 router.get('/:id', show);
+router.post('/', store);
+router.patch('/:id', modify);
 
 
 // EXPORT ROUTER

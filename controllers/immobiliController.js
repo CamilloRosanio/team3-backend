@@ -177,8 +177,56 @@ function show(req, res) {
     });
 };
 
+
+// STORE
+function store(req, res) {
+
+    // REQUEST BODY PARAMS
+    const { id_proprietario, titolo, num_stanze, num_letti, num_bagni, città, indirizzo, tipologia, mq } = req.body;
+
+    // ERROR HANDLER
+    const validationError = paramsValidationImmobile({ id_proprietario, titolo, num_stanze, num_letti, num_bagni, città, indirizzo, tipologia, mq });
+    if (validationError) {
+        return res.status(400).json(validationError);
+    };
+
+    // QUERY PARAMS ARRAY
+    const sqlParams = [id_proprietario, titolo, num_stanze, num_letti, num_bagni, città, indirizzo, tipologia, mq];
+
+    // SQL STORE QUERY
+    let sqlStore = `
+    INSERT INTO boolbnb.immobili (
+        id_proprietario,
+        titolo,
+        num_stanze,
+        num_letti,
+        num_bagni,
+        città,
+        indirizzo,
+        tipologia,
+        mq
+      )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+
+    // CALL STORE QUERY
+    connection.query(sqlStore, sqlParams, (err, results) => {
+
+        // ERROR HANDLER
+        if (err) {
+            return errorHandler500(err, res);
+        }
+
+        // POSITIVE RESPONSE
+        res.status(201).json({
+            message: 'Immobile successfully posted',
+            id_immobile: results.insertId
+        });
+    });
+};
+
+
 // EXPORT CRUD
-module.exports = { index, show };
+module.exports = { index, show, store, modify };
 
 
 /******************************************************************************
@@ -193,6 +241,7 @@ const generateCompleteImagePath = (imageName) => {
     return `${config.APP_HOST}:${config.APP_PORT}/img/immobili/${imageName}`;
 };
 
+
 // ERROR HANDLER (500)
 const errorHandler500 = (err, res) => {
     if (err) {
@@ -204,6 +253,7 @@ const errorHandler500 = (err, res) => {
     }
 };
 
+
 // ERROR HANDLER (404)
 const errorHandler404 = (item, res) => {
     if (!item) {
@@ -212,4 +262,144 @@ const errorHandler404 = (item, res) => {
             message: 'Not found'
         });
     }
+};
+
+
+// PARAMS VALIDATION - STORE
+function paramsValidationImmobile({ id_proprietario, titolo, num_stanze, num_letti, num_bagni, città, indirizzo, tipologia, mq }) {
+
+    // WORDS BLACKLIST
+    const forbiddenWords = ['parolaccia', 'insulto'];
+    const allowedTipologie = ['Appartamento', 'Attico', 'Loft', 'Monolocale', 'Villetta'];
+
+    // VALIDATION - ID_PROPRIETARIO
+    if (!id_proprietario) {
+        return {
+            status: 'KO',
+            message: 'Invalid field: id_proprietario',
+            validation_details: 'id_proprietario is required and must be of "int" type.'
+        };
+    }
+
+
+    // VALIDATION - TITOLO
+    if (!titolo || typeof titolo !== 'string' || titolo.length > 150) {
+        return {
+            status: 'KO',
+            message: 'Invalid field: titolo',
+            validation_details: 'titolo is required and must be a string of 150 characters max.'
+        };
+    }
+
+    for (let word of forbiddenWords) {
+        if (titolo.toLowerCase().includes(word.toLowerCase())) {
+            return {
+                status: 'KO',
+                message: 'Invalid field: titolo',
+                validation_details: `titolo cannot contain blacklisted words like '${word}'.`
+            };
+        }
+    }
+
+
+    // VALIDATION - NUM_STANZE
+    if (!num_stanze || num_stanze == null || typeof num_stanze !== 'number' || num_stanze < 1 || num_stanze > 100) {
+        return {
+            status: 'KO',
+            message: 'Invalid field: num_stanze',
+            validation_details: 'num_stanze must be a number between 1 and 100.'
+        };
+    };
+
+
+    // VALIDATION - NUM_LETTI
+    if (!num_letti || num_letti == null || typeof num_letti !== 'number' || num_letti < 1 || num_letti > 100) {
+        return {
+            status: 'KO',
+            message: 'Invalid field: num_letti',
+            validation_details: 'num_letti must be a number between 1 and 100.'
+        };
+    };
+
+
+    // VALIDATION - NUM_BAGNI
+    if (!num_bagni || num_bagni == null || typeof num_bagni !== 'number' || num_bagni < 1 || num_bagni > 100) {
+        return {
+            status: 'KO',
+            message: 'Invalid field: num_bagni',
+            validation_details: 'num_bagni must be a number between 1 and 100.'
+        };
+    };
+
+
+    // VALIDATION - CITTÀ
+    if (!città || typeof città !== 'string' || città.length > 60) {
+        return {
+            status: 'KO',
+            message: 'Invalid field: titolo',
+            validation_details: 'titolo is required and must be a string of 60 characters max.'
+        };
+    }
+
+    for (let word of forbiddenWords) {
+        if (città.toLowerCase().includes(word.toLowerCase())) {
+            return {
+                status: 'KO',
+                message: 'Invalid field: città',
+                validation_details: `città cannot contain blacklisted words like '${word}'.`
+            };
+        }
+    }
+
+
+    // VALIDATION - INDIRIZZO
+    if (!indirizzo || typeof indirizzo !== 'string' || indirizzo.length > 150) {
+        return {
+            status: 'KO',
+            message: 'Invalid field: indirizzo',
+            validation_details: 'indirizzo is required and must be a string of 150 characters max.'
+        };
+    }
+
+    for (let word of forbiddenWords) {
+        if (indirizzo.toLowerCase().includes(word.toLowerCase())) {
+            return {
+                status: 'KO',
+                message: 'Invalid field: indirizzo',
+                validation_details: `indirizzo cannot contain blacklisted words like '${word}'.`
+            };
+        }
+    }
+
+
+    // VALIDATION - TIPOLOGIA
+    if (!tipologia || typeof tipologia !== 'string' || tipologia.length > 45) {
+        return {
+            status: 'KO',
+            message: 'Invalid field: tipologia',
+            validation_details: 'tipologia is required and must be a string of 45 characters max.'
+        };
+    }
+
+    if (!allowedTipologie.includes(tipologia)) {
+        return {
+            status: 'KO',
+            message: 'Invalid field: tipologia',
+            validation_details: `tipologia must match one of the following values: ${allowedTipologie}'`
+        };
+    }
+
+
+    // VALIDATION - MQ
+    if (!mq || mq == null || typeof mq !== 'number' || mq < 1 || mq > 50000) {
+        return {
+            status: 'KO',
+            message: 'Invalid field: mq',
+            validation_details: 'mq must be a number between 1 and 50000.'
+        };
+    };
+
+
+    // END OF VALIDATION
+    return null;
 };

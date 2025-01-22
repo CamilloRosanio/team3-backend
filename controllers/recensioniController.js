@@ -17,70 +17,150 @@ const config = {
   APP_PORT: APP_PORT || "3000",
 };
 
+
 /******************************************************************************
 # CRUD
 ******************************************************************************/
 
-// INDEX
-function index(req, res) {
-  // SQL INDEX QUERY
-  let sqlIndex = `
-    SELECT * FROM boolbnb.recensioni`;
+// STORE
+function store(req, res) {
 
-  // CALL INDEX QUERY
-  connection.query(sqlIndex, (err, results) => {
+  // REQUEST BODY PARAMS
+  const { id_utente, id_immobile, titolo, testo, voto, num_giorni_di_permanenza } = req.body;
+
+  // ERROR HANDLER
+  const validationError = paramsValidation({ id_utente, id_immobile, titolo, testo, voto, num_giorni_di_permanenza });
+  if (validationError) {
+    return res.status(400).json(validationError);
+  };
+
+  // QUERY PARAMS ARRAY
+  const sqlParams = [id_utente, id_immobile, titolo, testo, voto, num_giorni_di_permanenza];
+
+  // SQL STORE QUERY
+  let sqlStore = `
+  INSERT INTO boolbnb.recensioni (
+      id_utente,
+      id_immobile,
+      titolo,
+      testo,
+      voto,
+      num_giorni_di_permanenza)
+  VALUES (?, ?, ?, ?, ?, ?);`;
+
+  // CALL STORE QUERY
+  connection.query(sqlStore, sqlParams, (err, results) => {
+
     // ERROR HANDLER
     if (err) {
       return errorHandler500(err, res);
     }
 
-    // ITEM MAPPING
-    const immobili = results.map((immobile) => ({
-      ...immobile,
-      immagine: generateCompleteImagePath(immobile.immagine),
-      voto: immobile.voto === null ? 0 : immobile.voto || 0,
-    }));
-
     // POSITIVE RESPONSE
-    res.json({
-      status: "OK",
-      immobili: immobili,
+    res.status(201).json({
+      message: 'Review successfully posted',
+      id_recensione: results.insertId
     });
   });
-}
+};
+
 
 // EXPORT CRUD
-module.exports = { index };
+module.exports = { store };
+
 
 /******************************************************************************
 # UTILITY FUNCTIONS
 ******************************************************************************/
-
-// IMAGE PATH MAPPING
-const generateCompleteImagePath = (imageName) => {
-  if (!imageName) {
-    return `${config.APP_HOST}:${config.APP_PORT}/img/immobili/immobili-default.jpg`;
-  }
-  return `${config.APP_HOST}:${config.APP_PORT}/img/immobili/${imageName}`;
-};
 
 // ERROR HANDLER (500)
 const errorHandler500 = (err, res) => {
   if (err) {
     console.error(err);
     return res.status(500).json({
-      status: "KO",
-      message: "Database query failed",
+      status: 'KO',
+      message: 'Database query failed'
     });
   }
 };
 
-// ERROR HANDLER (404)
-const errorHandler404 = (item, res) => {
-  if (!item) {
-    return res.status(404).json({
-      status: "KO",
-      message: "Not found",
-    });
+
+// PARAMS VALIDATION
+function paramsValidation({ id_utente, id_immobile, titolo, testo, voto, num_giorni_di_permanenza }) {
+
+  // WORDS BLACKLIST
+  const forbiddenWords = ['parolaccia', 'insulto'];
+
+  // VALIDATION - ID_UTENTE
+  if (!id_utente) {
+    id_utente = 0;
   }
+
+  // VALIDATION - ID_IMMOBILE
+  if (!id_immobile) {
+    return {
+      status: 'KO',
+      message: 'Invalid field: id_immobile',
+      validation_details: 'id_immobile is required and must be of "int" type.'
+    };
+  }
+
+  // VALIDATION - TITOLO
+  if (!titolo || typeof titolo !== 'string' || titolo.length > 60) {
+    return {
+      status: 'KO',
+      message: 'Invalid field: titolo',
+      validation_details: 'titolo is required and must be a string of 60 characters max.'
+    };
+  }
+
+  for (let word of forbiddenWords) {
+    if (titolo.toLowerCase().includes(word.toLowerCase())) {
+      return {
+        status: 'KO',
+        message: 'Invalid field: titolo',
+        validation_details: `titolo cannot contain blacklisted words like '${word}'.`
+      };
+    }
+  }
+
+  // VALIDATION - TESTO
+  if (!testo || typeof testo !== 'string') {
+    return {
+      status: 'KO',
+      message: 'Invalid field: testo',
+      validation_details: 'testo is required and must be a string.'
+    };
+  }
+
+  for (let word of forbiddenWords) {
+    if (testo.toLowerCase().includes(word.toLowerCase())) {
+      return {
+        status: 'KO',
+        message: 'Invalid field: testo',
+        validation_details: `testo cannot contain blacklisted words like '${word}'.`
+      };
+    }
+  }
+
+  // VALIDATION - VOTO
+  if (!voto || typeof voto !== 'number' || voto < 1 || voto > 5) {
+    return {
+      status: 'KO',
+      message: 'Invalid field: voto',
+      validation_details: 'voto is required and must be a number between 1 and 5.'
+    };
+  }
+
+  // VALIDATION - NUM_GIORNI_DI_PERMANENZA
+  if (!num_giorni_di_permanenza || num_giorni_di_permanenza == null || typeof num_giorni_di_permanenza !== 'number' || num_giorni_di_permanenza < 1 || num_giorni_di_permanenza > 365) {
+    return {
+      status: 'KO',
+      message: 'Invalid field: num_giorni_di_permanenza',
+      validation_details: 'num_giorni_di_permanenza must be a number between 1 and 365.'
+    };
+  };
+
+  // END OF VALIDATION
+  return null;
 };
