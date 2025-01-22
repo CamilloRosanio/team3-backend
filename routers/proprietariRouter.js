@@ -4,11 +4,10 @@ const router = express.Router();
 
 
 // IMPORT CONTROLLER
-const { index, show } = require('../controllers/proprietariController');
+const { show } = require('../controllers/proprietariController');
 
 
 // DICHIARAZIONE ROUTES
-router.get('/', index);
 router.get('/:id', show);
 
 

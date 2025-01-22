@@ -7,7 +7,7 @@ const { DB_HOST, DB_NAME, DB_USER, DB_PASSWORD } = process.env;
 
 const configDB = {
     DB_HOST: DB_HOST || 'localhost',
-    DB_NAME: DB_NAME || 'booldb',
+    DB_NAME: DB_NAME || 'boolbnb',
     DB_USER: DB_USER || 'root',
     DB_PASSWORD: DB_PASSWORD || 'password',
 };
