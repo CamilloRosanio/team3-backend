@@ -118,12 +118,15 @@ function show(req, res) {
         proprietari.nome AS nome_proprietario,
         proprietari.cognome AS cognome_proprietario,
         proprietari.email AS email_proprietario,
-        proprietari.telefono AS telefono_proprietario
+        proprietari.telefono AS telefono_proprietario,
+        tipologie_immobile.nome AS tipologia
         FROM boolbnb.immobili
         LEFT JOIN boolbnb.recensioni
         ON immobili.id = recensioni.id_immobile
         JOIN boolbnb.proprietari
         ON immobili.id_proprietario = proprietari.id
+        JOIN boolbnb.tipologie_immobile
+        ON immobili.id_tipologia_immobile = tipologie_immobile.id
         WHERE immobili.id = ?
     GROUP BY immobili.id`;
 
