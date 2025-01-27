@@ -32,6 +32,8 @@ const immobiliRouter = require("./routers/immobiliRouter");
 app.use("/api/immobili", immobiliRouter);
 const recensioniRouter = require("./routers/recensioniRouter");
 app.use("/api/recensioni", recensioniRouter);
+const tipologieImmobileRouter = require("./routers/tipologieImmobileRouter");
+app.use("/api/tipologie-immobile", tipologieImmobileRouter);
 
 
 // ERROR HANDLERS
