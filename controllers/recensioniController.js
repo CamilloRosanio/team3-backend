@@ -26,21 +26,21 @@ const config = {
 function store(req, res) {
 
   // REQUEST BODY PARAMS
-  const { id_utente, id_immobile, titolo, testo, voto, num_giorni_di_permanenza } = req.body;
+  const { nome, id_immobile, titolo, testo, voto, num_giorni_di_permanenza } = req.body;
 
   // ERROR HANDLER
-  const validationError = paramsValidation({ id_utente, id_immobile, titolo, testo, voto, num_giorni_di_permanenza });
+  const validationError = paramsValidation({ nome, id_immobile, titolo, testo, voto, num_giorni_di_permanenza });
   if (validationError) {
     return res.status(400).json(validationError);
   };
 
   // QUERY PARAMS ARRAY
-  const sqlParams = [id_utente, id_immobile, titolo, testo, voto, num_giorni_di_permanenza];
+  const sqlParams = [nome, id_immobile, titolo, testo, voto, num_giorni_di_permanenza];
 
   // SQL STORE QUERY
   let sqlStore = `
   INSERT INTO boolbnb.recensioni (
-      id_utente,
+      nome,
       id_immobile,
       titolo,
       testo,
@@ -86,14 +86,28 @@ const errorHandler500 = (err, res) => {
 
 
 // PARAMS VALIDATION
-function paramsValidation({ id_utente, id_immobile, titolo, testo, voto, num_giorni_di_permanenza }) {
+function paramsValidation({ nome, id_immobile, titolo, testo, voto, num_giorni_di_permanenza }) {
 
   // WORDS BLACKLIST
   const forbiddenWords = ['parolaccia', 'insulto'];
 
-  // VALIDATION - ID_UTENTE
-  if (!id_utente) {
-    id_utente = 0;
+  // VALIDATION - NOME
+  if (!nome || typeof nome !== 'string' || nome.length > 45) {
+    return {
+      status: 'KO',
+      message: 'Invalid field: nome',
+      validation_details: 'nome is required and must be a string of 45 characters max.'
+    };
+  }
+
+  for (let word of forbiddenWords) {
+    if (nome.toLowerCase().includes(word.toLowerCase())) {
+      return {
+        status: 'KO',
+        message: 'Invalid field: nome',
+        validation_details: `nome cannot contain blacklisted words like '${word}'.`
+      };
+    }
   }
 
   // VALIDATION - ID_IMMOBILE

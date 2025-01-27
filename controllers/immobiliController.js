@@ -147,13 +147,8 @@ function show(req, res) {
         // REVIEWS QUERY
         const sqlIndexReviews = `
         SELECT
-		    recensioni.*,
-            utenti.id AS id_utente,
-            utenti.nome AS nome_utente,
-            utenti.cognome AS cognome_utente
+		    *
             FROM boolbnb.recensioni
-            JOIN boolbnb.utenti
-            ON recensioni.id_utente = utenti.id
         WHERE recensioni.id_immobile = ?`;
 
         // CALL INDEX REVIEWS QUERY
