@@ -37,10 +37,14 @@ function index(req, res) {
     let sqlIndex = `
     SELECT 
         immobili.*,
-        AVG(recensioni.voto) AS voto 
+        AVG(recensioni.voto) AS voto,
+        tipologie_immobile.nome AS tipologia 
         FROM boolbnb.immobili
         LEFT JOIN boolbnb.recensioni
-    ON immobili.id = recensioni.id_immobile`;
+        ON immobili.id = recensioni.id_immobile
+        JOIN boolbnb.tipologie_immobile
+    ON immobili.id_tipologia_immobile = tipologie_immobile.id
+    `;
 
     // FILTERS
     let filtersArray = [];
@@ -71,7 +75,7 @@ function index(req, res) {
     }
 
     if (filterType) {
-        sqlIndex += ` ${firstFilter ? `WHERE` : `AND`} immobili.tipologia LIKE ?`;
+        sqlIndex += ` ${firstFilter ? `WHERE` : `AND`} tipologie_immobile.nome LIKE ?`;
         filtersArray.push(`%${filterType}%`);
         firstFilter = false;
     }
