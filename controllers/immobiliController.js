@@ -224,7 +224,7 @@ function store(req, res) {
         num_bagni,
         città,
         indirizzo,
-        tipologia,
+        id_tipologia_immobile,
         mq
       )
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
