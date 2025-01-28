@@ -194,7 +194,7 @@ function store(req, res) {
         num_bagni: parseInt(num_bagni),
         città,
         indirizzo,
-        id_tipologia_immobile: parseInt(tipologia),
+        id_tipologia_immobile: parseInt(id_tipologia_immobile),
         mq: parseInt(mq),
     });
     if (validationError) {
