@@ -315,7 +315,7 @@ function paramsValidationImmobile({
     num_bagni,
     città,
     indirizzo,
-    tipologia,
+    id_tipologia_immobile,
     mq,
 }) {
     // WORDS BLACKLIST
@@ -447,7 +447,7 @@ function paramsValidationImmobile({
         return {
             status: "KO",
             message: "Invalid field: id_tipologia_immobile",
-            validation_details: "id_tipologia_immobile must be a number between 1 and 100.",
+            validation_details: "id_tipologia_immobile must be a number.",
         };
     }
 
