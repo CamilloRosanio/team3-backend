@@ -171,7 +171,7 @@ function paramsValidation({ nome, id_immobile, titolo, testo, voto, num_giorni_d
     return {
       status: 'KO',
       message: 'Invalid field: num_giorni_di_permanenza',
-      validation_details: 'num_giorni_di_permanenza must be a number between 1 and 365.'
+      validation_details: 'num_giorni_di_permanenza must be a number between 1 and 255.'
     };
   };
 
