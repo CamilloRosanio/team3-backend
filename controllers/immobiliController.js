@@ -181,7 +181,7 @@ function store(req, res) {
         num_bagni,
         città,
         indirizzo,
-        tipologia,
+        id_tipologia_immobile,
         mq,
     } = req.body;
 
@@ -194,7 +194,7 @@ function store(req, res) {
         num_bagni: parseInt(num_bagni),
         città,
         indirizzo,
-        tipologia,
+        id_tipologia_immobile: parseInt(tipologia),
         mq: parseInt(mq),
     });
     if (validationError) {
@@ -210,7 +210,7 @@ function store(req, res) {
         num_bagni,
         città,
         indirizzo,
-        tipologia,
+        id_tipologia_immobile,
         mq,
     ];
 
@@ -320,13 +320,6 @@ function paramsValidationImmobile({
 }) {
     // WORDS BLACKLIST
     const forbiddenWords = ["parolaccia", "insulto"];
-    const allowedTipologie = [
-        "Appartamento",
-        "Attico",
-        "Loft",
-        "Monolocale",
-        "Villetta",
-    ];
 
     // VALIDATION - ID_PROPRIETARIO
     if (!id_proprietario) {
@@ -444,20 +437,17 @@ function paramsValidationImmobile({
     }
 
     // VALIDATION - TIPOLOGIA
-    if (!tipologia || typeof tipologia !== "string" || tipologia.length > 45) {
+    if (
+        !id_tipologia_immobile ||
+        id_tipologia_immobile == null ||
+        typeof id_tipologia_immobile !== "number" ||
+        id_tipologia_immobile < 1 ||
+        id_tipologia_immobile > 100
+    ) {
         return {
             status: "KO",
-            message: "Invalid field: tipologia",
-            validation_details:
-                "tipologia is required and must be a string of 45 characters max.",
-        };
-    }
-
-    if (!allowedTipologie.includes(tipologia)) {
-        return {
-            status: "KO",
-            message: "Invalid field: tipologia",
-            validation_details: `tipologia must match one of the following values: ${allowedTipologie}'`,
+            message: "Invalid field: id_tipologia_immobile",
+            validation_details: "id_tipologia_immobile must be a number between 1 and 100.",
         };
     }
 
