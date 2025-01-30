@@ -50,13 +50,13 @@ function index(req, res) {
   let firstFilter = true;
 
   if (filterCity) {
-    sqlIndex += ` ${firstFilter ? `WHERE` : `AND`} immobili.città LIKE ?`;
+    sqlIndex += ` ${firstFilter ? `WHERE (` : `AND`} immobili.città LIKE ?`;
     filtersArray.push(`%${filterCity}%`);
     firstFilter = false;
   }
 
   if (filterAddress) {
-    sqlIndex += ` ${firstFilter ? `WHERE` : `OR`} immobili.indirizzo LIKE ?`;
+    sqlIndex += ` ${firstFilter ? `WHERE` : `OR`} immobili.indirizzo LIKE ? )`;
     filtersArray.push(`%${filterAddress}%`);
     firstFilter = false;
   }
