@@ -185,8 +185,9 @@ function store(req, res) {
     indirizzo,
     id_tipologia_immobile,
     mq,
-    immagine,
   } = req.body;
+
+  let { immagine } = req.body;
 
   // ERROR HANDLER
   const validationError = paramsValidationImmobile({
@@ -205,6 +206,8 @@ function store(req, res) {
   }
 
   // QUERY PARAMS ARRAY
+
+  immagine = isValidImg(immagine) ? immagine : "";
 
   const sqlParams = [
     id_proprietario,
@@ -291,6 +294,12 @@ const generateCompleteImagePath = (imageName) => {
   }
   return `${config.APP_HOST}:${config.APP_PORT}/img/immobili/${imageName}`;
 };
+
+// STORE IMAGE VALIDATION
+
+function isValidImg(filename) {
+  return /^([1-9]|[1-2][0-9]|30)\.jpg$/.test(filename);
+}
 
 // ERROR HANDLER (500)
 const errorHandler500 = (err, res) => {
