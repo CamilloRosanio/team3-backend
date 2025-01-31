@@ -30,8 +30,6 @@ function index(req, res) {
   const filterBeds = req.query.beds || "1";
   const filterType = req.query.type || "%";
 
-  console.log(filterCity, filterAddress, filterRooms, filterBeds, filterType);
-
   // SQL QUERY
   let sqlIndex = `
     SELECT 
@@ -88,8 +86,6 @@ function index(req, res) {
 
   // CALL INDEX QUERY
   connection.query(sqlIndex, filtersArray, (err, results) => {
-    console.log(sqlIndex, filtersArray);
-
     // ERROR HANDLER
     if (err) {
       return errorHandler500(err, res);
@@ -189,6 +185,7 @@ function store(req, res) {
     indirizzo,
     id_tipologia_immobile,
     mq,
+    immagine,
   } = req.body;
 
   // ERROR HANDLER
@@ -208,6 +205,7 @@ function store(req, res) {
   }
 
   // QUERY PARAMS ARRAY
+
   const sqlParams = [
     id_proprietario,
     titolo,
@@ -218,6 +216,7 @@ function store(req, res) {
     indirizzo,
     id_tipologia_immobile,
     mq,
+    immagine,
   ];
 
   // SQL QUERY
@@ -231,9 +230,11 @@ function store(req, res) {
         città,
         indirizzo,
         id_tipologia_immobile,
-        mq
+        mq,
+    immagine
+
       )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
 
   // CALL STORE QUERY
   connection.query(sqlStore, sqlParams, (err, results) => {
